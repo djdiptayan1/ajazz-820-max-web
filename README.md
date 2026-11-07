@@ -1,63 +1,130 @@
 # AJAZZ 820 Max Web
 
-## Run
+[![Checks](https://github.com/djdiptayan1/ajazz-820-max-web/actions/workflows/checks.yml/badge.svg)](https://github.com/djdiptayan1/ajazz-820-max-web/actions/workflows/checks.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+A community-built WebHID lighting controller for compatible **AJAZZ AK820** keyboards. Change effects and paint individual keys directly from your browser—without the Windows driver.
+
+**Unofficial and independent. Not affiliated with or endorsed by AJAZZ.** Model names are not enough to establish compatibility: check the USB identifiers below.
+
+## What works
+
+- Lighting effects with supported brightness, speed, direction, and palette controls.
+- Per-key RGB painting, fill-all, and dark-frame editing.
+- Preview first, then explicitly **Apply to keyboard**.
+- **Draft / Last sent** views, with the last successful upload remembered in your browser.
+- Physical-code key tester.
+- Dark, Light, and System appearance with saved preference.
+- Desktop controls above a stationary keyboard; responsive narrow-screen previews.
+
+Connecting or editing a draft does not write to the keyboard. Applying custom RGB replaces the complete lighting frame; unpainted keys become dark.
+
+## Compatibility
+
+| Requirement | Support |
+| --- | --- |
+| USB vendor / product | `1a2c:a036` |
+| Configuration collection | Usage page `0xFF02`, usage `0x02` |
+| Connection | Wired USB |
+| Browser | Desktop Chrome or Edge with WebHID |
+| Page origin | `localhost` or HTTPS |
+| Keyboard mode | Lighting physically verified in Windows and Mac modes |
+| Bluetooth / 2.4 GHz receiver | Not supported by this app |
+| Safari / Firefox | No WebHID control; not supported for hardware access |
+
+The tested device identifies as **Shinetek Technology AK820**. Other AK820-branded variants can use different controllers and protocols. Do not broaden device filters without checking the hardware.
+
+## Quick start
+
+No dependencies or build step are required.
 
 ```sh
+git clone https://github.com/djdiptayan1/ajazz-820-max-web.git
+cd ajazz-820-max-web
 python3 -m http.server 3000
 ```
 
-Open http://localhost:3000 in Chrome or Edge. Connect the keyboard by USB cable.
-Click **Connect Keyboard**, select AK820, and approve Chrome's device chooser.
+1. Open **http://localhost:3000** in Chrome or Edge.
+2. Connect the keyboard with a USB data cable.
+3. Click **Connect keyboard**, select AK820, and approve the browser prompt.
+4. Choose **Effects** or **Per-key colors** and edit your draft.
+5. Click **Apply to keyboard** when ready.
 
-- **Lighting:** choose Effects or Per-key colors, edit the draft, then click **Apply to keyboard**.
-- Per-key painting never sends immediately. Fill all keys and Make all dark edit only the draft.
-- Custom uploads contain the whole frame. Unpainted keys are dark.
-- Preset effects accept seven palette colors or rainbow, not arbitrary RGB. Brightness 1/5 is dim, not off.
-- Live key testing uses browser physical key codes. Fn and OS-reserved shortcuts may not reach the page.
-- **Draft / Last sent:** compare edits with the most recent successful write, saved locally in this browser and restored after reload.
-- There is no known lighting readback command. Colors changed with physical keyboard shortcuts or another application cannot be recovered automatically. The vendor app also keeps its own local state.
-- Connecting does not change keyboard lighting. Last sent is a local copy, never proof of current hardware state.
-- All feature sections remain navigable. Unsupported sections explain their limits rather than presenting nonfunctional forms.
-- Desktop controls use multiple columns above a stationary bottom keyboard. Both lighting modes fit without scrolling at 1280×800 and 1440×900. Shorter windows scroll only the controls; mobile retains normal scrolling.
-- **Appearance:** choose Dark, Light, or System in the toolbar. The preference persists in this browser; System follows OS appearance. Theme changes never change hardware colors.
+For custom painting, choose a color and click keys. **Fill all keys** and **Make all dark** only edit the draft until Apply.
+
+### Important preview limitation
+
+There is **no known lighting readback command** in the documented protocol. The app cannot retrieve colors saved using keyboard shortcuts or another application.
+
+**Last sent is a local record, not a live hardware reading.** It persists in this browser and origin. Clearing site storage removes it. Effect previews indicate selected colors; they do not reproduce exact hardware animations. Preset effects use seven palette colors or rainbow; arbitrary RGB is available in custom mode. Brightness 1/5 is dim, not off.
 
 ## Deploy on Vercel
 
-Import this repository. Use **Other** as the framework preset, repository root as the root directory, no build command, and `.` as the output directory.
+Import this repository with these settings:
 
-Vercel HTTPS supports WebHID in desktop Chrome/Edge. Approve the keyboard again on the deployed origin. Local previews and appearance settings are stored per origin and do not transfer from localhost.
+| Setting | Value |
+| --- | --- |
+| Framework preset | Other |
+| Root directory | Repository root |
+| Build command | None |
+| Output directory | `.` |
 
-## Hardware and evidence
+The repository includes `vercel.json`. Open the deployment directly in a browser tab, not an embedded preview. Approve the keyboard again for the deployed HTTPS origin. Localhost permissions, previews, and appearance preferences do not transfer to the deployment.
 
-Targets only wired VID `1a2c`, PID `a036`, collection `FF02:02`.
-Each WebHID output is `sendReport(0, data)` with 64 data bytes.
-Header: `AA 55 CC 33`; command at byte 4; payload starts at byte 5.
+## Development
 
-- Effect command `07`: mode minus one, brightness 0–4, speed 0–4, direction 0/1, palette 0–7.
-- Custom RGB: command `0B`, then `F6`–`FB`, each carrying 54 RGB bytes across a 108-LED frame.
-- Correct indices include Esc 15, W 55, A 59, S 60, D 61, Enter 70, Space 94. LED 80 is slash, not Space.
+The app uses native JavaScript modules and plain HTML/CSS.
 
-The user confirmed the browser-driven Esc green, WASD cyan, Space magenta, and Enter yellow test on physical hardware.
-The browser also completed a static-red write. Other effects are sourced from ajazz-linux, not individually checked here.
+| File | Purpose |
+| --- | --- |
+| `index.html` | Workspace and accessible controls |
+| `style.css` | Responsive layout and appearance tokens |
+| `app.js` | Draft editing, persistence, connection UI |
+| `protocol.js` | HID framing, validation, serialized writes |
+| `layout.js` | Physical keys, LED indices, browser key mapping |
+| `protocol.test.mjs` | Color, packet boundary, and key-mapping regressions |
 
-Protocol and layout source: [prasoondev/ajazz-linux](https://github.com/prasoondev/ajazz-linux), `ajazzctl/protocol.py`, `ajazzctl/layout.py`, and `docs/PROTOCOL.md`.
-The extracted OemDrv.exe targets a different controller; its older packet format is not used by this web app.
-
-Bluetooth and receiver configuration are not supported. Battery responses remain unverified.
-Remapping, macros, profiles, music streaming, performance settings, and factory reset controls remain disabled; they do not send speculative commands.
-No firmware flashing is implemented. Custom colors may be stored by the keyboard.
-
-## Regression check
+Run the regression checks with Node.js 22 or newer:
 
 ```sh
 node --experimental-default-type=module protocol.test.mjs
 ```
 
-## Changes
+Then serve the app and exercise the affected browser workflow. Hardware claims require a real device test; packet construction tests alone are not proof.
 
-- Replaced the incompatible inline driver with one shared module implementation.
-- Integrated hardware-confirmed output framing and corrected per-key LED indices.
-- Serialized RGB uploads and surfaced transfer errors without false success messages.
-- Removed the obsolete assembler that could restore incorrect packets.
-- Redesigned as a keyboard-first workspace with accessible controls, responsive layout and reduced-motion support.
-- Added explicit preview-before-apply editing and persistent last-sent colors. Verified actual WebHID upload and reload restoration in Chrome.
+## Protocol and evidence
+
+Reports contain 64 bytes and use `sendReport(0, data)`. The header is `AA 55 CC 33`, command is byte 4, and payload starts at byte 5.
+
+- `07`: effect settings, including mode minus one and zero-based brightness/speed.
+- `0B`, then `F6`–`FB`: custom RGB, six 54-byte chunks forming 108 RGB LED slots.
+- Verified indices include Esc 15, W 55, A 59, S 60, D 61, Enter 70, and Space 94. LED 80 is slash, not Space.
+
+Physical tests confirmed static colors and a custom frame with Esc green, WASD cyan, Space magenta, and Enter yellow. Other effects are sourced from the upstream protocol research and are not individually verified by this project.
+
+Protocol and layout research comes from **[prasoondev/ajazz-linux](https://github.com/prasoondev/ajazz-linux)**, particularly `ajazzctl/protocol.py`, `ajazzctl/layout.py`, and [`docs/PROTOCOL.md`](https://github.com/prasoondev/ajazz-linux/blob/master/docs/PROTOCOL.md). Upstream attribution is preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Not implemented
+
+Keys & layers, Performance, Macros, and Profiles remain visible with honest availability notices. Hardware remapping, macro uploads, onboard profiles, battery readout, music streaming, performance writes, and factory reset are not implemented. No firmware flashing is provided.
+
+Contributions toward these features are welcome, but require evidence for the correct controller and observable hardware behavior. Unknown commands are not safe defaults.
+
+## Troubleshooting
+
+- **No keyboard in the chooser:** use wired mode and a data-capable cable. Check the supported VID/PID; close other keyboard configuration tools.
+- **WebHID unavailable:** use desktop Chrome/Edge on localhost or HTTPS. Mobile and embedded browsers may not expose USB access.
+- **Permission or connection failure:** reconnect the keyboard, close other tabs using it, then connect again. Browser and OS device-access policy can block access.
+- **Preview differs from keyboard:** Last sent is not readback. Physical shortcuts and other applications can change hardware independently.
+- **Colors disappeared after deployment:** browser storage and permissions are origin-specific. Recreate the draft on the deployed site.
+- **Fn or OS shortcuts do not highlight:** firmware or macOS may intercept them before the page receives keyboard events.
+
+## Contributing
+
+Bug reports, hardware observations, accessibility improvements, and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md). Use the issue templates to include the exact USB IDs, browser, connection mode, and reproduction steps. Never include serial numbers or unrelated device data.
+
+Please keep discussion respectful and focused on reproducible behavior. Report security concerns privately using [SECURITY.md](SECURITY.md).
+
+## License
+
+[MIT](LICENSE). Includes MIT-licensed protocol/layout research from prasoondev/ajazz-linux; see [third-party notices](THIRD_PARTY_NOTICES.md). Vendor binaries and firmware are not distributed in this repository.

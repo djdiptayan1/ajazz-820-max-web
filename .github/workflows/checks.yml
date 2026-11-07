@@ -1,0 +1,22 @@
+name: Checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  protocol:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --experimental-default-type=module --check app.js
+          node --experimental-default-type=module --check protocol.js
+          node --experimental-default-type=module --check layout.js
+      - name: Check RGB protocol behavior
+        run: node --experimental-default-type=module protocol.test.mjs
