@@ -31,6 +31,7 @@ Built for the desk you already use—with wired USB control verified in Mac and 
 | **Per-key RGB** — paint individual keys, fill the whole board, or create a dark frame. | **Draft / Last sent** — compare edits with your last successful upload, remembered in this browser. |
 | **Dark, Light & System** — comfortable themes with a saved appearance preference. | **Physical key tester** — highlight keys using browser physical key codes. |
 | **Keyboard-first workspace** — multi-column controls above a stationary desktop keyboard. | **No install or build step** — plain HTML, CSS, JavaScript modules, and WebHID. |
+| **Lighting profiles** — save named drafts locally, export JSON, and import validated profiles. | **No automatic writes** — load a profile into the draft, then explicitly Apply from Lighting. |
 
 ### A color for every key
 
@@ -129,6 +130,9 @@ node --experimental-default-type=module protocol.test.mjs
 ```
 
 Then serve the app and exercise the affected browser workflow. Hardware claims require a real device test; packet construction tests alone are not proof.
+### Lighting profiles
+
+Open **Profiles**, enter a name, and save the current lighting draft. **Load draft** restores it without sending commands. **Export draft** downloads portable JSON; **Import profile** adds a validated file to this browser’s list. Profiles are local lighting presets, not onboard keymap slots. Remapping, macros, sleep and debounce remain unavailable: the bundled OemDrv.exe configures different USB controller IDs than the attached `1a2c:a036` device.
 
 ## Protocol and evidence
 

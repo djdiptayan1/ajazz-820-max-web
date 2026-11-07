@@ -38,3 +38,5 @@
 @media(max-width:1100px){.appearance-label{display:none}}@media(max-width:760px){.toolbar{flex-wrap:wrap}.toolbar-actions{gap:.5rem!important}.toolbar>div{font-size:.8rem}}
 @media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.toolbar{background:var(--ground);backdrop-filter:none}}
 @media(prefers-contrast:more){:root:not([data-theme="light"]){--muted:var(--ink)}}
+#profilesPanel{max-width:46rem}#profilesPanel .field{display:flex;flex-direction:column;gap:.4rem;margin:.8rem 0}#profileName{padding:.55rem;border:1px solid var(--control-line);border-radius:6px;background:var(--control);color:var(--control-ink)}#profilesPanel .paint-actions{display:flex;flex-wrap:wrap;gap:.5rem}#importProfile{max-width:100%;display:block;margin-top:.4rem}
+#profilesPanel .paint-actions>*{min-width:0;max-width:100%}#profilesPanel input[type=file]{width:100%}#profilesPanel label[for=importProfile]{white-space:normal}

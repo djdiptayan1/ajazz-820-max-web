@@ -112,12 +112,35 @@ function keyEvent(event,down){const id=CODE_TO_KEY_ID[event.code];if(!down){if(i
 window.addEventListener('keydown',e=>keyEvent(e,true));window.addEventListener('keyup',e=>keyEvent(e,false));
 window.addEventListener('blur',()=>document.querySelectorAll('.pressed').forEach(el=>el.classList.remove('pressed')));
 $('testModeCheck').onchange=()=>document.querySelectorAll('.pressed').forEach(el=>el.classList.remove('pressed'));
-const sections={keys:['Keys & layers','Inspect keys on the canvas. Hardware remapping and layer writes have not been verified, so they are unavailable.'],performance:['Performance','Sleep, debounce, polling rate and software mode switching are not verified for this controller. Use the keyboard’s physical mode switch.'],macros:['Macros','Onboard macro encoding has not been decoded. Recording or uploading macros is not available.'],profiles:['Profiles','The app remembers one last-sent lighting copy in this browser. Onboard profile switching and profile imports are not available.']};
+const profilesKey='ak820-profiles-v1';
+let profiles=[];
+function profileDraft(value){
+ if(!value || !['effect','custom'].includes(value.mode) || !value.settings || !value.colors || typeof value.colors!=='object' || Array.isArray(value.colors))throw new Error('Invalid lighting profile.');
+ lightingPacket(value.settings);
+ for(const [id,color] of Object.entries(value.colors)){if(!KEYBOARD_KEYS.some(k=>String(k.id)===id)||!/^#[0-9a-f]{6}$/i.test(color))throw new Error('Invalid profile key or color.');}
+ return {mode:value.mode,settings:{effectId:value.settings.effectId,brightness:value.settings.brightness,speed:value.settings.speed,direction:value.settings.direction,colorIndex:value.settings.colorIndex},colors:{...value.colors}};
+}
+function profileList(){
+ $('profileSelect').replaceChildren(...profiles.map((p,i)=>new Option(p.name,String(i))));
+ $('loadProfileBtn').disabled=!profiles.length;
+}
+try{const saved=JSON.parse(localStorage.getItem(profilesKey)||'[]');if(!Array.isArray(saved))throw new Error();profiles=saved.map(p=>{if(typeof p.name!=='string'||!p.name.trim()||p.name.length>60)throw new Error();return {name:p.name,draft:profileDraft(p.draft)};});}catch{tell('Saved profiles could not be loaded. Existing storage was not changed.',true);}
+profileList();
+function saveProfile(name,value){
+ const next=[...profiles,{name,draft:profileDraft(value)}];
+ localStorage.setItem(profilesKey,JSON.stringify(next));profiles=next;profileList();$('profileSelect').value=String(profiles.length-1);
+}
+const profileAction=fn=>{try{fn();}catch(error){tell(error.message,true);}};
+$('saveProfileBtn').onclick=()=>profileAction(()=>{const name=$('profileName').value.trim();if(!name)throw new Error('Enter a profile name.');saveProfile(name,draft);tell('Profile saved in this browser. Keyboard unchanged.');});
+$('loadProfileBtn').onclick=()=>profileAction(()=>{const p=profiles[Number($('profileSelect').value)];if(!p)throw new Error('Select a saved profile.');draft=profileDraft(p.draft);edit();tell('Profile loaded into draft. Open Lighting to apply it.');});
+$('exportProfileBtn').onclick=()=>profileAction(()=>{const blob=new Blob([JSON.stringify({format:'ak820-lighting',version:1,name:$('profileName').value.trim()||'My lighting',draft:profileDraft(draft)},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='ak820-lighting.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+$('importProfile').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>65536)throw new Error('Profile must be smaller than 64 KiB.');const value=JSON.parse(await file.text());if(value.format!=='ak820-lighting'||value.version!==1||typeof value.name!=='string'||!value.name.trim()||value.name.length>60)throw new Error('Unsupported lighting profile.');saveProfile(value.name.trim(),value.draft);tell('Profile imported. Load it to preview; keyboard unchanged.');}catch(error){tell(error.message,true);}finally{e.target.value='';}};
+const sections={keys:['Keys & layers','Inspect keys on the canvas. Hardware remapping and layer writes have not been verified, so they are unavailable.'],performance:['Performance','Sleep, debounce, polling rate and software mode switching are not verified for this controller. Use the keyboard’s physical mode switch.'],macros:['Macros','Onboard macro encoding has not been decoded. Recording or uploading macros is not available.'],profiles:['Profiles']};
 for(const button of document.querySelectorAll('.nav-item'))button.onclick=()=>{
- const lighting=button.dataset.section==='lighting';document.querySelectorAll('.nav-item').forEach(b=>{b.classList.toggle('active',b===button);if(b===button)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
- $('lightingPanel').hidden=!lighting;$('applyBar').hidden=!lighting;$('unavailablePanel').hidden=lighting;
- $('pageTitle').textContent=lighting?'Make it yours.':sections[button.dataset.section][0];$('pageDescription').textContent=lighting?'Set the mood, or give every key its own color.':'Your keyboard, with clear boundaries.';
- if(!lighting){$('unavailableTitle').textContent=sections[button.dataset.section][0];$('unavailableCopy').textContent=sections[button.dataset.section][1];}
+ const section=button.dataset.section,lighting=section==='lighting',isProfiles=section==='profiles';document.querySelectorAll('.nav-item').forEach(b=>{b.classList.toggle('active',b===button);if(b===button)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+ $('lightingPanel').hidden=!lighting;$('profilesPanel').hidden=!isProfiles;$('applyBar').hidden=!lighting;$('unavailablePanel').hidden=lighting||isProfiles;
+ $('pageTitle').textContent=lighting?'Make it yours.':sections[section][0];$('pageDescription').textContent=lighting?'Set the mood, or give every key its own color.':'Your keyboard, with clear boundaries.';
+ if(!lighting&&!isProfiles){$('unavailableTitle').textContent=sections[section][0];$('unavailableCopy').textContent=sections[section][1];}
 };
 if(!navigator.hid)tell('USB control needs desktop Chrome or Edge. You can still preview colors here.');
 controls();
