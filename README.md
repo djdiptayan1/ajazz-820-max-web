@@ -139,16 +139,18 @@ Open **Profiles**, enter a name, and save the current lighting draft. **Load dra
 Reports contain 64 bytes and use `sendReport(0, data)`. The header is `AA 55 CC 33`, command is byte 4, and payload starts at byte 5.
 
 - `07`: effect settings, including mode minus one and zero-based brightness/speed.
-- `0B`, then `F6`–`FB`: custom RGB, six 54-byte chunks forming 108 RGB LED slots.
+- Custom RGB: `07` with mode byte `17` (mode 24), then `0B`, then `F6`–`FB`: six 54-byte chunks forming 108 RGB LED slots. Mode selection is required when switching from a preset effect.
 - Verified indices include Esc 15, W 55, A 59, S 60, D 61, Enter 70, and Space 94. LED 80 is slash, not Space.
 
 Physical tests confirmed static colors and a custom frame with Esc green, WASD cyan, Space magenta, and Enter yellow. Other effects are sourced from the upstream protocol research and are not individually verified by this project.
+
+Hardware profile regression: the first imported-profile upload transferred successfully but produced no visible change. Selecting custom mode before the frame fixed it. The owner confirmed the correct Esc/WASD/Enter/Space pattern after applying through the updated app from static blue in Windows mode. The previous lighting copy was then sent back.
 
 Protocol and layout research comes from **[prasoondev/ajazz-linux](https://github.com/prasoondev/ajazz-linux)**, particularly `ajazzctl/protocol.py`, `ajazzctl/layout.py`, and [`docs/PROTOCOL.md`](https://github.com/prasoondev/ajazz-linux/blob/master/docs/PROTOCOL.md). Upstream attribution is preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Not implemented
 
-Keys & layers, Performance, Macros, and Profiles remain visible with honest availability notices. Hardware remapping, macro uploads, onboard profiles, battery readout, music streaming, performance writes, and factory reset are not implemented. No firmware flashing is provided.
+Keys & layers, Performance, and Macros remain visible with honest availability notices. Local lighting profiles support save/load and JSON import/export; onboard profiles are not implemented. Hardware remapping, macro uploads, battery readout, music streaming, performance writes, and factory reset are not implemented. No firmware flashing is provided.
 
 Contributions toward these features are welcome, but require evidence for the correct controller and observable hardware behavior. Unknown commands are not safe defaults.
 
