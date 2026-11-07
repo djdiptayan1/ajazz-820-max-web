@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AK820 — Keyboard Studio</title>
+<script>
+try { const theme = localStorage.getItem('ak820-appearance'); document.documentElement.dataset.theme = ['light','dark'].includes(theme) ? theme : 'system'; } catch { document.documentElement.dataset.theme = 'system'; }
+</script>
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#workspace">Skip to workspace</a>
+<div class="app-shell">
+<aside class="sidebar">
+  <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 9h1m3 0h1m3 0h1m3 0h0M6 12h1m3 0h1m3 0h1m3 0h0M7 15h10"/></svg><span>Keyboard Studio<small>AJAZZ AK820</small></span></div>
+  <nav aria-label="Keyboard features">
+    <button class="nav-item active" data-section="lighting" aria-current="page">Lighting</button>
+    <button class="nav-item" data-section="keys">Keys & layers</button>
+    <button class="nav-item" data-section="performance">Performance</button>
+    <button class="nav-item" data-section="macros">Macros</button>
+    <button class="nav-item" data-section="profiles">Profiles</button>
+  </nav>
+  <div class="sidebar-note"><strong>Your keyboard. Your colors.</strong><p>USB control, without the Windows driver.</p><span>Mac mode tested</span></div>
+</aside>
+<div class="main-shell">
+<header class="toolbar"><div><span class="device-dot" id="statusDot"></span><span id="statusText">Not connected</span><span class="connection-type">USB · AK820</span></div><div class="toolbar-actions"><label class="appearance-label" for="appearanceSelect">Appearance</label><select id="appearanceSelect" aria-label="Appearance"><option value="system">System</option><option value="dark">Dark</option><option value="light">Light</option></select><button id="connectBtn" class="button">Connect keyboard</button></div></header>
+<main id="workspace">
+<div class="page-heading"><div><h1 id="pageTitle">Make it yours.</h1><p id="pageDescription">Set the mood, or give every key its own color.</p></div><span class="draft-badge" id="draftBadge">Local preview</span></div>
+<div class="control-workspace">
+<div class="state-note"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 9v5m0-8v1"/></svg><p>The keyboard cannot report its saved colors. This canvas shows your draft or the last colors sent from this browser. Physical shortcuts can change the keyboard without updating it.</p></div>
+<section id="lightingPanel" class="editor">
+  <div class="settings-pane"><h2>Lighting</h2><div class="segmented mode-switch"><button id="effectMode" aria-pressed="true">Effects</button><button id="paintMode" aria-pressed="false">Per-key colors</button></div>
+  <div id="effectsControls"><label class="field" for="lightingModeSelect">Effect<select id="lightingModeSelect"></select></label><div class="range-field"><label for="brightnessSlider">Brightness <output id="brightnessVal">5 / 5</output></label><input type="range" id="brightnessSlider" min="0" max="4" value="4"><small>Lowest level is dim, not off.</small></div><div class="range-field"><label for="speedSlider">Speed <output id="speedVal">3 / 5</output></label><input type="range" id="speedSlider" min="0" max="4" value="2"></div><label class="field" for="directionSelect">Direction<select id="directionSelect"><option value="0">Left to right</option><option value="1">Right to left</option></select></label></div>
+  <div id="paintControls" hidden><p class="helper">Choose a color, then select keys on the keyboard. Changes stay in your draft until you apply.</p><label class="field" for="lightingColor">Paint color<div class="color-input"><input type="color" id="lightingColor" value="#00ffff"><span id="colorHexText">#00FFFF</span></div></label><div class="paint-actions"><button id="fillBtn" class="button">Fill all keys</button><button id="clearBtn" class="button">Make all dark</button></div><p class="helper">Applying replaces the entire custom frame. Unpainted keys become dark.</p></div>
+  </div>
+  <div class="color-pane"><h2 id="paletteTitle">Color palette</h2><p class="helper" id="paletteHint">Hardware effects use these seven colors or rainbow.</p><div id="palette" class="palette" aria-label="Colors"></div><label id="rainbowLabel" class="check rainbow"><input id="rainbowToggle" type="checkbox"> Rainbow colors</label><div class="selection-info"><h3 id="selectionTitle">A preview, not a live feed</h3><p id="selectionDescription">Effect previews show the selected color, not an exact animation. Custom colors map directly to the physical LEDs.</p></div></div>
+</section>
+<section id="unavailablePanel" class="unavailable" hidden><h2 id="unavailableTitle"></h2><p id="unavailableCopy"></p><span class="unavailable-label">Not available yet</span><p>No commands are sent from this section. Lighting and per-key colors remain available.</p></section>
+<div class="apply-bar" id="applyBar"><div><strong id="changeSummary">Ready to preview</strong><span id="saveHint">Nothing is sent until you apply.</span></div><button id="applyLightingBtn" class="button primary">Apply to keyboard</button></div>
+<div class="feedback" id="statusLog" role="status" aria-live="polite">Connect your keyboard with a USB cable to begin.</div>
+<details class="details"><summary>Connection & compatibility</summary><p>Chrome or Edge · wired USB · 1A2C:A036. Lighting is verified in Mac and Windows keyboard modes. Bluetooth and receiver control are not supported. No firmware flashing.</p></details>
+</div>
+<section class="canvas" aria-label="Virtual keyboard">
+  <div class="canvas-toolbar"><div class="segmented" aria-label="Preview source"><button id="viewDraft" aria-pressed="true">Draft</button><button id="viewSent" aria-pressed="false">Last sent</button></div><label class="check"><input id="testModeCheck" type="checkbox" checked> Test keys</label></div>
+  <div class="keyboard-scroll"><div id="keyboardGrid" class="keyboard-grid" aria-label="AK820 key layout"></div></div>
+  <div class="canvas-caption"><span id="previewCaption">Local preview · not read from your keyboard</span><span id="selectedKeyName">Select a key to inspect it</span></div>
+</section>
+</main>
+</div>
+</div>
+</body>
+</html>

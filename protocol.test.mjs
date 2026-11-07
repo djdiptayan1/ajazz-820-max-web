@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {customPackets, lightingPacket, rgb} from './protocol.js';
+import {KEYBOARD_KEYS, CODE_TO_KEY_ID} from './layout.js';
+
+assert.deepEqual(rgb('#ff0000'),[255,0,0]);
+assert.deepEqual(rgb('#000000'),[0,0,0]);
+assert.throws(() => rgb('#xyzxyz'));
+const red = lightingPacket({effectId:7,brightness:4,speed:3,direction:0,colorIndex:0});
+assert.deepEqual([...red.slice(0,10)],[170,85,204,51,7,6,4,3,0,0]);
+assert.throws(() => lightingPacket({effectId:7,brightness:5,speed:3,direction:0,colorIndex:0}));
+const packets = customPackets({15:'#00ff00',94:'#ff00ff',70:'#ffff00'},KEYBOARD_KEYS);
+const frame = Uint8Array.from(packets.slice(1).flatMap(p => [...p.slice(5,59)]));
+assert.deepEqual([...frame.slice(94*3,94*3+3)],[255,0,255]);
+assert.deepEqual([...frame.slice(80*3,80*3+3)],[0,0,0]);
+assert.deepEqual([...frame.slice(70*3,70*3+3)],[255,255,0]);
+assert.deepEqual([...frame.slice(15*3,15*3+3)],[0,255,0]);
+assert.deepEqual(packets.map(p => p[4]),[11,246,247,248,249,250,251]);
+assert.equal(CODE_TO_KEY_ID.KeyA,59);
+assert.equal(CODE_TO_KEY_ID.KeyE,54);
+assert.equal(CODE_TO_KEY_ID.Space,94);
+console.log('RGB boundaries, exact colors and physical key mapping passed.');
