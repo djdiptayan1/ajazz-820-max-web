@@ -28,7 +28,7 @@ export function customPackets(colors, keys) {
   for (const key of keys) {
     if (colors[key.id] !== undefined) frame.set(rgb(colors[key.id]), key.led * 3);
   }
-  return [packet(0x0b), ...Array.from({length:6},(_,i) => packet(0xf6+i,frame.subarray(i*54,(i+1)*54)))];
+  return [packet(7,[23,4,2,0,5]), packet(0x0b), ...Array.from({length:6},(_,i) => packet(0xf6+i,frame.subarray(i*54,(i+1)*54)))];
 }
 export function isKeyboard(device) {
   return device.vendorId === 0x1a2c && device.productId === 0xa036 && device.collections.some(c => c.usagePage === 0xff02 && c.usage === 2 && c.outputReports.some(r => r.reportId === 0));
