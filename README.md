@@ -1,23 +1,61 @@
+<div align="center">
+
 # AJAZZ 820 Max Web
+
+### Your keyboard. Your colors. No Windows driver.
+
+A browser-based lighting studio for compatible **AJAZZ AK820** keyboards.
+Built for the desk you already use—with wired USB control verified in Mac and Windows keyboard modes.
 
 [![Checks](https://github.com/djdiptayan1/ajazz-820-max-web/actions/workflows/checks.yml/badge.svg)](https://github.com/djdiptayan1/ajazz-820-max-web/actions/workflows/checks.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![WebHID](https://img.shields.io/badge/USB-WebHID-185bd6)](#compatibility)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-28815a)](CONTRIBUTING.md)
 
-A community-built WebHID lighting controller for compatible **AJAZZ AK820** keyboards. Change effects and paint individual keys directly from your browser—without the Windows driver.
+[Get started](#quick-start) · [Compatibility](#compatibility) · [Deploy on Vercel](#deploy-on-vercel) · [Contribute](#contributing)
 
-**Unofficial and independent. Not affiliated with or endorsed by AJAZZ.** Model names are not enough to establish compatibility: check the USB identifiers below.
+</div>
 
-## What works
+![Keyboard Studio in dark mode, showing effect controls above the docked AK820 keyboard preview](.github/images/dark-effects.png)
 
-- Lighting effects with supported brightness, speed, direction, and palette controls.
-- Per-key RGB painting, fill-all, and dark-frame editing.
-- Preview first, then explicitly **Apply to keyboard**.
-- **Draft / Last sent** views, with the last successful upload remembered in your browser.
-- Physical-code key tester.
-- Dark, Light, and System appearance with saved preference.
-- Desktop controls above a stationary keyboard; responsive narrow-screen previews.
+<p align="center"><sub>Real app capture · dark appearance · local draft preview, not a live hardware reading.</sub></p>
 
-Connecting or editing a draft does not write to the keyboard. Applying custom RGB replaces the complete lighting frame; unpainted keys become dark.
+> **Check your hardware first:** wired USB `1a2c:a036`, collection `FF02:02`. AK820-branded variants can use different controllers.
+> This is an independent community project, not affiliated with or endorsed by AJAZZ.
+
+## Features
+
+| Make it yours | Stay in control |
+| --- | --- |
+| **Hardware effects** — select lighting presets and supported brightness, speed, direction, and palette settings. | **Preview → Apply** — connection and draft edits never write to the keyboard. |
+| **Per-key RGB** — paint individual keys, fill the whole board, or create a dark frame. | **Draft / Last sent** — compare edits with your last successful upload, remembered in this browser. |
+| **Dark, Light & System** — comfortable themes with a saved appearance preference. | **Physical key tester** — highlight keys using browser physical key codes. |
+| **Keyboard-first workspace** — multi-column controls above a stationary desktop keyboard. | **No install or build step** — plain HTML, CSS, JavaScript modules, and WebHID. |
+
+### A color for every key
+
+![Per-key RGB editor with green Esc, cyan WASD, yellow Enter, and magenta Space in the draft](.github/images/per-key-colors.png)
+
+Pick a color, select your keys, then **Apply to keyboard**. The screenshot shows an editable draft of the same Esc / WASD / Enter / Space color arrangement previously verified on physical hardware.
+
+> Applying custom RGB replaces the complete frame. Unpainted keys become dark.
+
+<details>
+<summary><strong>Prefer a lighter workspace? View light mode</strong></summary>
+
+![Keyboard Studio in light mode with effect controls and the docked keyboard preview](.github/images/light-effects.png)
+
+Choose **Light**, **Dark**, or **System** in the toolbar. Your preference is remembered independently of keyboard lighting.
+
+</details>
+
+## Three steps from idea to keyboard
+
+1. **Connect** your compatible keyboard over USB and approve the browser prompt.
+2. **Create** an effect or per-key color draft without changing the hardware.
+3. **Apply** when ready; revisit **Last sent** to see this browser’s saved copy.
+
+The screenshots are genuine browser captures. They show local previews, not a connection, readback, or simulated hardware result.
 
 ## Compatibility
 
